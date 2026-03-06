@@ -3,6 +3,9 @@ import type { TabType } from './types/index.ts';
 import TabSwitcher from './components/TabSwitcher';
 import Tab1 from './pages/Tab1';
 import Tab2 from './pages/Tab2';
+import Tab3 from './pages/Tab3';
+import Tab4 from './pages/Tab4';
+import Tab5 from './pages/Tab5';
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabType>('tab1');
@@ -27,6 +30,9 @@ function App() {
         <div style={{ flex: 1, overflow: 'hidden' }}>
           {activeTab === 'tab1' && <Tab1 />}
           {activeTab === 'tab2' && <Tab2 />}
+          {activeTab === 'tab3' && <Tab3 />}
+          {activeTab === 'tab4' && <Tab4 />}
+          {activeTab === 'tab5' && <Tab5 />}
         </div>
       </div>
     </div>

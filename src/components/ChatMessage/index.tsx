@@ -1,16 +1,59 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { ChatMessage as ChatMessageType, Engineer, TaskRequirement } from '../../types/index.ts';
+import type {
+  ChatMessage as ChatMessageType,
+  Engineer,
+  TaskRequirement,
+  ScheduledTask,
+  ReschedulePlan,
+  AffectedTaskChange,
+  PreScheduleTask,
+  EngineerWeeklyAvailability,
+  PreScheduleResultSet,
+  PreScheduleSummary,
+  WeeklyGanttOverview,
+  DispatchQualityReport,
+  UtilizationDashboard,
+  TravelCostMonitor,
+  OTComplianceReport,
+  CapabilityMappingReport,
+  WeeklyReportData,
+  PendingFeedbackList,
+  SurveyPushData,
+  PhoneCallbackData,
+  FeedbackSummaryData,
+  FeedbackAnomalyReport,
+  WeChatSurveyData,
+} from '../../types/index.ts';
 import EngineerList from './EngineerList';
 import TaskInfoCard from '../TaskInfoCard';
+import ScheduleOverviewCard from '../ScheduleOverviewCard';
+import ReschedulePlanCard from '../ReschedulePlanCard';
+import ChangeSummaryCard from '../ChangeSummaryCard';
+import PreScheduleTaskListCard from '../PreScheduleTaskListCard';
+import EngineerWeeklyAvailabilityCard from '../EngineerWeeklyAvailabilityCard';
+import PreScheduleResultCard from '../PreScheduleResultCard';
+import PreScheduleSummaryCard from '../PreScheduleSummaryCard';
+import WeeklyGanttOverviewCard from '../WeeklyGanttOverviewCard';
+import DispatchQualityScoreCard from '../DispatchQualityScoreCard';
+import UtilizationDashboardCard from '../UtilizationDashboardCard';
+import TravelCostMonitorCard from '../TravelCostMonitorCard';
+import OTComplianceAlertCard from '../OTComplianceAlertCard';
+import CapabilityMappingCard from '../CapabilityMappingCard';
+import WeeklyReportCard from '../WeeklyReportCard';
+import PendingFeedbackListCard from '../PendingFeedbackListCard';
+import SurveyPushCard from '../SurveyPushCard';
+import PhoneCallbackInputCard from '../PhoneCallbackInputCard';
+import FeedbackSummaryCard from '../FeedbackSummaryCard';
+import FeedbackAnomalyAlertCard from '../FeedbackAnomalyAlertCard';
+import WeChatSurveyCard from '../WeChatSurveyCard';
 
 interface ChatMessageProps {
   message: ChatMessageType;
-  isAgent?: boolean;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message, isAgent = false }) => {
-  const isSelf = message.sender === 'dispatcher';
+const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
+  const isSelf = message.sender === 'dispatcher' || message.sender === 'coordinator' || message.sender === 'customer';
   const isSystem = message.sender === 'system';
 
   // 系统消息
@@ -39,6 +82,46 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isAgent = false }) =
         );
       case 'task-info':
         return <TaskInfoCard task={message.extraData as TaskRequirement} />;
+      case 'schedule-overview':
+        return <ScheduleOverviewCard schedule={message.extraData as ScheduledTask[]} />;
+      case 'reschedule-plan':
+        return <ReschedulePlanCard plan={message.extraData as ReschedulePlan} />;
+      case 'change-summary':
+        return <ChangeSummaryCard changes={message.extraData as AffectedTaskChange[]} />;
+      case 'pre-schedule-task-list':
+        return <PreScheduleTaskListCard tasks={message.extraData as PreScheduleTask[]} />;
+      case 'engineer-weekly-availability':
+        return <EngineerWeeklyAvailabilityCard rows={message.extraData as EngineerWeeklyAvailability[]} />;
+      case 'pre-schedule-result':
+        return <PreScheduleResultCard data={message.extraData as PreScheduleResultSet} />;
+      case 'pre-schedule-summary':
+        return <PreScheduleSummaryCard summary={message.extraData as PreScheduleSummary} />;
+      case 'weekly-gantt-overview':
+        return <WeeklyGanttOverviewCard data={message.extraData as WeeklyGanttOverview} />;
+      case 'dispatch-quality-score':
+        return <DispatchQualityScoreCard data={message.extraData as DispatchQualityReport} />;
+      case 'utilization-dashboard':
+        return <UtilizationDashboardCard data={message.extraData as UtilizationDashboard} />;
+      case 'travel-cost-monitor':
+        return <TravelCostMonitorCard data={message.extraData as TravelCostMonitor} />;
+      case 'ot-compliance-alert':
+        return <OTComplianceAlertCard data={message.extraData as OTComplianceReport} />;
+      case 'capability-mapping':
+        return <CapabilityMappingCard data={message.extraData as CapabilityMappingReport} />;
+      case 'weekly-report':
+        return <WeeklyReportCard data={message.extraData as WeeklyReportData} />;
+      case 'pending-feedback-list':
+        return <PendingFeedbackListCard data={message.extraData as PendingFeedbackList} />;
+      case 'survey-push':
+        return <SurveyPushCard data={message.extraData as SurveyPushData} />;
+      case 'phone-callback':
+        return <PhoneCallbackInputCard data={message.extraData as PhoneCallbackData} />;
+      case 'feedback-summary':
+        return <FeedbackSummaryCard data={message.extraData as FeedbackSummaryData} />;
+      case 'feedback-anomaly-alert':
+        return <FeedbackAnomalyAlertCard data={message.extraData as FeedbackAnomalyReport} />;
+      case 'wechat-survey':
+        return <WeChatSurveyCard data={message.extraData as WeChatSurveyData} />;
       case 'text':
       default:
         // 处理@提及
@@ -84,7 +167,30 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isAgent = false }) =
         {/* 消息内容 */}
         <div
           className={`message-content ${isSelf ? 'self' : 'other'}`}
-          style={message.contentType === 'engineer-list' || message.contentType === 'task-info'
+          style={[
+            'engineer-list',
+            'task-info',
+            'schedule-overview',
+            'reschedule-plan',
+            'change-summary',
+            'pre-schedule-task-list',
+            'engineer-weekly-availability',
+            'pre-schedule-result',
+            'pre-schedule-summary',
+            'weekly-gantt-overview',
+            'dispatch-quality-score',
+            'utilization-dashboard',
+            'travel-cost-monitor',
+            'ot-compliance-alert',
+            'capability-mapping',
+            'weekly-report',
+            'pending-feedback-list',
+            'survey-push',
+            'phone-callback',
+            'feedback-summary',
+            'feedback-anomaly-alert',
+            'wechat-survey',
+          ].includes(message.contentType)
             ? { backgroundColor: 'transparent', padding: 0, boxShadow: 'none' }
             : {}
           }

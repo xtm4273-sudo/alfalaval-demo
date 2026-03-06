@@ -1,81 +1,61 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { ChatMessage } from '../../types/index.ts';
-import { tab2Scenarios } from '../../data/mockData';
+import { tab5Scenarios } from '../../data/mockData';
 import ChatMessageComponent from '../../components/ChatMessage';
 
 const scenarioGroups = [
-  { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: tab2Scenarios.slice(0, 3) },
-  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab2Scenarios.slice(3, 5) },
-  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab2Scenarios.slice(5) },
+  { id: 'customer', label: '📱 客户企微', scenarios: tab5Scenarios },
 ];
 
-const Tab2: React.FC = () => {
-  const [activeGroup, setActiveGroup] = useState<string>('normal');
-  const [currentScenario, setCurrentScenario] = useState<string>('scenario1');
+const Tab5: React.FC = () => {
+  const [currentScenario, setCurrentScenario] = useState<string>(tab5Scenarios[0].id);
   const [displayedMessages, setDisplayedMessages] = useState<ChatMessage[]>([]);
   const [messageIndex, setMessageIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scenario = tab2Scenarios.find((s) => s.id === currentScenario) || tab2Scenarios[0];
-  const currentGroup = scenarioGroups.find((g) => g.id === activeGroup) || scenarioGroups[0];
+  const scenario = tab5Scenarios.find((s) => s.id === currentScenario) || tab5Scenarios[0];
 
-  // 滚动到底部
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // 重置演示
   const resetDemo = () => {
     setDisplayedMessages([]);
     setMessageIndex(0);
     setIsPlaying(false);
   };
 
-  // 切换分组
-  const handleGroupChange = (groupId: string) => {
-    const group = scenarioGroups.find((g) => g.id === groupId);
-    if (!group) return;
-    setActiveGroup(groupId);
-    setCurrentScenario(group.scenarios[0].id);
+  const handleScenarioChange = (scenarioId: string) => {
+    setCurrentScenario(scenarioId);
     setDisplayedMessages([]);
     setMessageIndex(0);
     setIsPlaying(false);
   };
 
-  // 切换场景
-  const handleScenarioChange = (scenarioId: string) => {
-    setCurrentScenario(scenarioId);
-    resetDemo();
-  };
-
-  // 播放下一条消息
   const playNextMessage = () => {
     if (messageIndex < scenario.messages.length) {
-      setDisplayedMessages((prev) => [...prev, scenario.messages[messageIndex]]);
+      setDisplayedMessages((prev) => [...prev, scenario.messages[messageIndex] as ChatMessage]);
       setMessageIndex((prev) => prev + 1);
     } else {
       setIsPlaying(false);
     }
   };
 
-  // 自动播放
   useEffect(() => {
     if (isPlaying && messageIndex < scenario.messages.length) {
       const timer = setTimeout(() => {
         playNextMessage();
-      }, 1000);
+      }, 900);
       return () => clearTimeout(timer);
     }
   }, [isPlaying, messageIndex, scenario.messages.length]);
 
-  // 滚动到底部
   useEffect(() => {
     scrollToBottom();
   }, [displayedMessages]);
 
-  // 开始/暂停演示
   const togglePlay = () => {
     if (messageIndex >= scenario.messages.length) {
       resetDemo();
@@ -85,7 +65,6 @@ const Tab2: React.FC = () => {
     }
   };
 
-  // 下一步
   const nextStep = () => {
     if (messageIndex < scenario.messages.length) {
       playNextMessage();
@@ -96,46 +75,57 @@ const Tab2: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* 场景选择区 */}
       <div className="scenario-selector">
-        {/* 分组标签栏 */}
         <div className="scenario-group-tabs">
-          {scenarioGroups.map((group) => (
+          {scenarioGroups.map((g) => (
             <button
-              key={group.id}
-              onClick={() => handleGroupChange(group.id)}
-              className={`scenario-group-tab ${group.type}-tab ${activeGroup === group.id ? 'active' : ''}`}
+              key={g.id}
+              className="scenario-group-tab active"
+              style={{ backgroundColor: '#07c160' }}
             >
-              {group.label}
+              {g.label}
             </button>
           ))}
         </div>
-        {/* 当前分组的场景按钮（横向可滚动） */}
-        <div className="scenario-scroll-area">
-          {currentGroup.scenarios.map((s) => (
+        <div className="scenario-list">
+          {tab5Scenarios.map((s) => (
             <button
               key={s.id}
               onClick={() => handleScenarioChange(s.id)}
-              className={`scenario-btn ${currentGroup.type === 'urgent' ? 'urgent' : ''} ${currentScenario === s.id ? 'active' : ''}`}
+              className={`scenario-btn ${currentScenario === s.id ? 'active' : ''}`}
             >
-              {s.name.replace('插单-', '').replace('预排-', '')}
+              {s.name}
             </button>
           ))}
         </div>
         <div className="scenario-description">{scenario.description}</div>
       </div>
 
-      {/* 群聊标题栏 */}
-      <div className="group-header">
-        <div className="group-icon">
-          👥
-        </div>
-        <div>
-          <div className="group-name">工程师派单群</div>
-          <div className="group-members">张经理、李明、王强、派单员小王</div>
-        </div>
+      {/* 群组标题栏（模拟企微群聊风格） */}
+      <div style={{
+        backgroundColor: '#ededed',
+        padding: '6px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '6px',
+        borderBottom: '1px solid #ddd',
+        flexShrink: 0,
+      }}>
+        <span style={{ fontSize: '14px' }}>💬</span>
+        <span style={{ fontSize: '12px', color: '#555', fontWeight: 500 }}>
+          {currentScenario === 'customer1' ? '宝钢-阿法拉伐服务群' : '华东服务-Leader 管理群'}
+        </span>
+        <span style={{
+          marginLeft: 'auto',
+          fontSize: '10px',
+          color: '#07c160',
+          fontWeight: 500,
+        }}>
+          企业微信
+        </span>
       </div>
 
       {/* 聊天区域 */}
-      <div className="chat-area">
+      <div className="chat-area" style={{ backgroundColor: '#f5f5f5' }}>
         <AnimatePresence>
           {displayedMessages.map((message) => (
             <ChatMessageComponent key={message.id} message={message} />
@@ -176,4 +166,4 @@ const Tab2: React.FC = () => {
   );
 };
 
-export default Tab2;
+export default Tab5;

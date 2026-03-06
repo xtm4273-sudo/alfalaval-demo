@@ -1,10 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import type { DemoScenario, ChatMessage } from '../../types/index.ts';
+import { AnimatePresence } from 'framer-motion';
+import type { ChatMessage } from '../../types/index.ts';
 import { tab1Scenarios } from '../../data/mockData';
 import ChatMessageComponent from '../../components/ChatMessage';
 
+const scenarioGroups = [
+  { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: tab1Scenarios.slice(0, 2) },
+  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 5) },
+  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab1Scenarios.slice(5) },
+];
+
 const Tab1: React.FC = () => {
+  const [activeGroup, setActiveGroup] = useState<string>('normal');
   const [currentScenario, setCurrentScenario] = useState<string>('scenario1');
   const [displayedMessages, setDisplayedMessages] = useState<ChatMessage[]>([]);
   const [messageIndex, setMessageIndex] = useState(0);
@@ -12,6 +19,7 @@ const Tab1: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scenario = tab1Scenarios.find((s) => s.id === currentScenario) || tab1Scenarios[0];
+  const currentGroup = scenarioGroups.find((g) => g.id === activeGroup) || scenarioGroups[0];
 
   // 滚动到底部
   const scrollToBottom = () => {
@@ -20,6 +28,17 @@ const Tab1: React.FC = () => {
 
   // 重置演示
   const resetDemo = () => {
+    setDisplayedMessages([]);
+    setMessageIndex(0);
+    setIsPlaying(false);
+  };
+
+  // 切换分组
+  const handleGroupChange = (groupId: string) => {
+    const group = scenarioGroups.find((g) => g.id === groupId);
+    if (!group) return;
+    setActiveGroup(groupId);
+    setCurrentScenario(group.scenarios[0].id);
     setDisplayedMessages([]);
     setMessageIndex(0);
     setIsPlaying(false);
@@ -75,17 +94,29 @@ const Tab1: React.FC = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      {/* 场景选择按钮 */}
+      {/* 场景选择区 */}
       <div className="scenario-selector">
-        <div className="scenario-label">选择演示场景：</div>
-        <div className="scenario-buttons">
-          {tab1Scenarios.map((s) => (
+        {/* 分组标签栏 */}
+        <div className="scenario-group-tabs">
+          {scenarioGroups.map((group) => (
+            <button
+              key={group.id}
+              onClick={() => handleGroupChange(group.id)}
+              className={`scenario-group-tab ${group.type}-tab ${activeGroup === group.id ? 'active' : ''}`}
+            >
+              {group.label}
+            </button>
+          ))}
+        </div>
+        {/* 当前分组的场景按钮（横向可滚动） */}
+        <div className="scenario-scroll-area">
+          {currentGroup.scenarios.map((s) => (
             <button
               key={s.id}
               onClick={() => handleScenarioChange(s.id)}
-              className={`scenario-btn ${currentScenario === s.id ? 'active' : ''}`}
+              className={`scenario-btn ${currentGroup.type === 'urgent' ? 'urgent' : ''} ${currentScenario === s.id ? 'active' : ''}`}
             >
-              {s.name}
+              {s.name.replace('插单-', '').replace('预排-', '')}
             </button>
           ))}
         </div>
