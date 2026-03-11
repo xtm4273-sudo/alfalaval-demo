@@ -24,11 +24,11 @@ const TabSwitcher: React.FC<TabSwitcherProps> = ({ activeTab, onTabChange }) => 
         群组通知
       </button>
       <button
-        className={activeTab === 'tab3' ? 'tab-btn tab-btn-analysis active' : 'tab-btn tab-btn-analysis'}
+        className={activeTab === 'tab3' ? 'tab-btn active' : 'tab-btn'}
         onClick={() => onTabChange('tab3')}
         style={{ fontSize: '11px' }}
       >
-        智能分析
+        工程师对话
       </button>
       <button
         className={activeTab === 'tab4' ? 'tab-btn tab-btn-feedback active' : 'tab-btn tab-btn-feedback'}

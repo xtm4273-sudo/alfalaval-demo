@@ -1,17 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { ChatMessage } from '../../types/index.ts';
-import { tab3Scenarios } from '../../data/mockData';
+import { tab3EngineerScenarios } from '../../data/mockData';
 import ChatMessageComponent from '../../components/ChatMessage';
 
+const engineerAvatars: Record<string, string> = {
+  eng1: '👨‍🔧',
+  eng2: '👨‍💻',
+  eng4: '👨‍🔧',
+  eng5: '👨‍🔬',
+  eng6: '👨‍🎓',
+};
+
+const engineerNames: Record<string, string> = {
+  eng1: '李明',
+  eng2: '王强',
+  eng4: '李明',
+  eng5: '张伟',
+  eng6: '陈晨',
+};
+
 const Tab3: React.FC = () => {
-  const [currentScenario, setCurrentScenario] = useState<string>(tab3Scenarios[0].id);
+  const [currentScenario, setCurrentScenario] = useState<string>(tab3EngineerScenarios[0].id);
   const [displayedMessages, setDisplayedMessages] = useState<ChatMessage[]>([]);
   const [messageIndex, setMessageIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scenario = tab3Scenarios.find((s) => s.id === currentScenario) || tab3Scenarios[0];
+  const scenario = tab3EngineerScenarios.find((s) => s.id === currentScenario) || tab3EngineerScenarios[0];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -32,7 +48,7 @@ const Tab3: React.FC = () => {
 
   const playNextMessage = () => {
     if (messageIndex < scenario.messages.length) {
-      setDisplayedMessages((prev) => [...prev, scenario.messages[messageIndex]]);
+      setDisplayedMessages((prev) => [...prev, scenario.messages[messageIndex] as ChatMessage]);
       setMessageIndex((prev) => prev + 1);
     } else {
       setIsPlaying(false);
@@ -72,30 +88,65 @@ const Tab3: React.FC = () => {
       {/* 场景选择区 */}
       <div className="scenario-selector">
         <div className="scenario-group-tabs">
-          <button className="scenario-group-tab analysis-tab active">
-            📊 智能分析
+          <button
+            className="scenario-group-tab active"
+            style={{ backgroundColor: '#1976d2' }}
+          >
+            🔧 工程师对话
           </button>
         </div>
-        <div className="analysis-scenario-grid">
-          {tab3Scenarios.map((s) => (
+        <div className="scenario-list">
+          {tab3EngineerScenarios.map((s) => (
             <button
               key={s.id}
               onClick={() => handleScenarioChange(s.id)}
-              className={`scenario-btn analysis-scenario-btn ${currentScenario === s.id ? 'active' : ''}`}
+              className={`scenario-btn ${currentScenario === s.id ? 'active' : ''}`}
             >
-              {s.name.replace('场景一：', '').replace('场景二：', '').replace('场景三：', '').replace('场景四：', '').replace('场景五：', '').replace('场景六：', '')}
+              {s.name}
             </button>
           ))}
         </div>
         <div className="scenario-description">{scenario.description}</div>
+      </div>
 
+      {/* 私聊标题栏 */}
+      <div style={{
+        backgroundColor: '#ededed',
+        padding: '6px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        borderBottom: '1px solid #ddd',
+        flexShrink: 0,
+      }}>
+        <span style={{ fontSize: '16px' }}>{engineerAvatars[currentScenario] || '👨‍🔧'}</span>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '12px', color: '#333', fontWeight: 600 }}>
+            {engineerNames[currentScenario] || '工程师'}
+          </div>
+          <div style={{ fontSize: '10px', color: '#888' }}>与智能派单助手的对话</div>
+        </div>
+        <span style={{
+          fontSize: '10px',
+          color: '#1976d2',
+          fontWeight: 500,
+          background: '#e3f2fd',
+          padding: '2px 7px',
+          borderRadius: '8px',
+        }}>
+          企业微信 · 私信
+        </span>
       </div>
 
       {/* 聊天区域 */}
-      <div className="chat-area">
+      <div className="chat-area" style={{ backgroundColor: '#f5f5f5' }}>
         <AnimatePresence>
           {displayedMessages.map((message) => (
-            <ChatMessageComponent key={message.id} message={message} />
+            <ChatMessageComponent
+              key={message.id}
+              message={message}
+              extraSelfSender="engineer"
+            />
           ))}
         </AnimatePresence>
         <div ref={messagesEndRef} />

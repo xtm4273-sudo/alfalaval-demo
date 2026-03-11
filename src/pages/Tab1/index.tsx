@@ -1,14 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import type { ChatMessage } from '../../types/index.ts';
-import { tab1Scenarios } from '../../data/mockData';
+import { tab1Scenarios, tab3Scenarios } from '../../data/mockData';
 import ChatMessageComponent from '../../components/ChatMessage';
 
 const scenarioGroups = [
   { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: tab1Scenarios.slice(0, 2) },
-  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 5) },
-  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab1Scenarios.slice(5) },
+  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 6) },
+  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab1Scenarios.slice(5, 6) },
+  { id: 'calendar', label: '🗓 工程师日历', type: 'normal' as const, scenarios: tab1Scenarios.slice(6) },
+  { id: 'analysis', label: '📊 智能分析', type: 'analysis' as const, scenarios: tab3Scenarios },
 ];
+
+const allScenarios = [...tab1Scenarios, ...tab3Scenarios];
 
 const Tab1: React.FC = () => {
   const [activeGroup, setActiveGroup] = useState<string>('normal');
@@ -18,8 +22,9 @@ const Tab1: React.FC = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scenario = tab1Scenarios.find((s) => s.id === currentScenario) || tab1Scenarios[0];
+  const scenario = allScenarios.find((s) => s.id === currentScenario) || tab1Scenarios[0];
   const currentGroup = scenarioGroups.find((g) => g.id === activeGroup) || scenarioGroups[0];
+  const isAnalysisGroup = activeGroup === 'analysis';
 
   // 滚动到底部
   const scrollToBottom = () => {
@@ -108,18 +113,32 @@ const Tab1: React.FC = () => {
             </button>
           ))}
         </div>
-        {/* 当前分组的场景按钮（横向可滚动） */}
-        <div className="scenario-scroll-area">
-          {currentGroup.scenarios.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => handleScenarioChange(s.id)}
-              className={`scenario-btn ${currentGroup.type === 'urgent' ? 'urgent' : ''} ${currentScenario === s.id ? 'active' : ''}`}
-            >
-              {s.name.replace('插单-', '').replace('预排-', '')}
-            </button>
-          ))}
-        </div>
+        {/* 当前分组的场景按钮 */}
+        {isAnalysisGroup ? (
+          <div className="analysis-scenario-grid">
+            {currentGroup.scenarios.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleScenarioChange(s.id)}
+                className={`scenario-btn analysis-scenario-btn ${currentScenario === s.id ? 'active' : ''}`}
+              >
+                {s.name.replace(/^场景[一二三四五六七八九十]：/, '')}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="scenario-scroll-area">
+            {currentGroup.scenarios.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleScenarioChange(s.id)}
+                className={`scenario-btn ${currentGroup.type === 'urgent' ? 'urgent' : ''} ${currentScenario === s.id ? 'active' : ''}`}
+              >
+                {s.name.replace('插单-', '').replace('预排-', '')}
+              </button>
+            ))}
+          </div>
+        )}
         <div className="scenario-description">{scenario.description}</div>
       </div>
 

@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>派工合理性分析报告 · Alfa Laval</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #f0f2f7;
+      color: #1a1a2e;
+      min-height: 100vh;
+    }
+
+    /* ── 顶部导航栏 ── */
+    .topbar {
+      background: linear-gradient(135deg, #0052a5 0%, #003d7a 100%);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+      height: 60px;
+      box-shadow: 0 2px 12px rgba(0,82,165,0.35);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+    }
+    .topbar-logo-img {
+      height: 36px;
+      width: auto;
+      background: #fff;
+      border-radius: 7px;
+      padding: 4px 10px;
+      display: block;
+      object-fit: contain;
+    }
+    .topbar-divider {
+      width: 1px; height: 24px;
+      background: rgba(255,255,255,0.3);
+      margin: 0 18px;
+    }
+    .topbar-title { font-size: 15px; font-weight: 500; opacity: 0.92; }
+    .topbar-badge {
+      margin-left: auto;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #52e88e; }
+
+    /* ── 历史报告时间轴条 ── */
+    .history-bar {
+      background: #fff;
+      border-bottom: 1px solid #e5e8ef;
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      height: 60px;
+      position: sticky;
+      top: 60px;
+      z-index: 90;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .history-bar-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #8a94a6;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .history-bar-sep {
+      width: 1px;
+      height: 20px;
+      background: #e5e8ef;
+      flex-shrink: 0;
+    }
+    .history-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .history-tabs::-webkit-scrollbar { display: none; }
+    .history-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      border: 1.5px solid #e5e8ef;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.18s;
+      background: #fff;
+      position: relative;
+    }
+    .history-tab:hover {
+      border-color: #a5b4fc;
+      background: #f5f8ff;
+    }
+    .history-tab.active {
+      border-color: #0052a5;
+      background: #eff4ff;
+    }
+    .history-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -13px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 3px;
+      background: #0052a5;
+      border-radius: 2px 2px 0 0;
+    }
+    .tab-month {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+    .history-tab.active .tab-month { color: #0052a5; }
+    .tab-pills {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .tab-pill {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 8px;
+      line-height: 1.4;
+    }
+    .tab-pill.score-good { background: #e8faf2; color: #15803d; }
+    .tab-pill.score-warn { background: #fff7ed; color: #b45309; }
+    .tab-pill.flag-pill { background: #fef2f2; color: #b91c1c; }
+    .tab-badge-new {
+      background: #0052a5;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    /* ── 主内容区 ── */
+    .main {
+      padding: 28px 32px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* 报告标题行 */
+    .report-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .report-title-group {}
+    .report-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0d1b3e;
+      line-height: 1.3;
+    }
+    .report-meta {
+      font-size: 13px;
+      color: #8a94a6;
+      margin-top: 5px;
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .report-meta span { display: flex; align-items: center; gap: 4px; }
+    .report-status-badge {
+      background: linear-gradient(135deg, #0052a5, #0073e6);
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 12px;
+      text-align: center;
+      line-height: 1.6;
+      flex-shrink: 0;
+    }
+    .report-status-badge .status-label { font-size: 10px; opacity: 0.8; }
+    .report-status-badge .status-value { font-size: 20px; font-weight: 700; }
+
+    /* KPI 卡片行 */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid #e8ebf2;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+    .kpi-label { font-size: 12px; color: #8a94a6; margin-bottom: 6px; font-weight: 500; }
+    .kpi-value { font-size: 28px; font-weight: 700; line-height: 1; }
+    .kpi-sub { font-size: 11px; margin-top: 5px; color: #8a94a6; }
+    .kpi-card.highlight-blue .kpi-value { color: #0052a5; }
+    .kpi-card.highlight-red .kpi-value { color: #dc2626; }
+    .kpi-card.highlight-green .kpi-value { color: #16a34a; }
+    .kpi-card.highlight-amber .kpi-value { color: #d97706; }
+
+    /* 评分分布图 */
+    .section {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8ebf2;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 16px 22px;
+      border-bottom: 1px solid #f0f2f7;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-header-icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .icon-blue { background: #eff4ff; }
+    .icon-amber { background: #fffbeb; }
+    .icon-green { background: #f0fdf4; }
+    .section-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+    .section-subtitle { font-size: 12px; color: #8a94a6; margin-left: auto; }
+    .section-body { padding: 20px 22px; }
+
+    /* 评分分布柱状图 */
+    .bar-chart { display: flex; gap: 12px; align-items: flex-end; height: 100px; }
+    .bar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+    .bar-fill {
+      width: 100%; border-radius: 4px 4px 0 0;
+      transition: height 0.4s ease;
+    }
+    .bar-label { font-size: 11px; color: #8a94a6; white-space: nowrap; }
+    .bar-count { font-size: 12px; font-weight: 600; }
+
+    /* 图例 */
+    .legend-row {
+      display: flex; gap: 18px; flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #4b5563; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* 记录列表 */
+    .record-list { display: flex; flex-direction: column; gap: 10px; }
+    .record-card {
+      border: 1px solid #e8ebf2;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex; align-items: flex-start; gap: 14px;
+      transition: box-shadow 0.15s;
+    }
+    .record-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .record-card.flagged {
+      border-color: #fecaca;
+      background: #fff8f8;
+    }
+    .score-ring {
+      width: 48px; height: 48px;
+      border-radius: 50%;
+      border: 3px solid;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .ring-green { border-color: #22c55e; color: #16a34a; }
+    .ring-amber { border-color: #f59e0b; color: #b45309; }
+    .ring-red { border-color: #ef4444; color: #dc2626; }
+    .record-body { flex: 1; }
+    .record-title-row {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+      margin-bottom: 5px;
+    }
+    .record-title { font-size: 13px; font-weight: 600; color: #1a1a2e; }
+    .record-engineer { font-size: 12px; color: #6b7280; }
+    .flag-badge {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 1px 8px;
+      font-weight: 500;
+    }
+    .normal-badge {
+      background: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+      border-radius: 6px;
+      font-size: 11px;
+      padding: 1px 8px;
+      font-weight: 500;
+    }
+    .indicator-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 5px; }
+    .indicator {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 11px; padding: 2px 8px; border-radius: 12px;
+    }
+    .ind-pass { background: #f0fdf4; color: #16a34a; }
+    .ind-fail { background: #fef2f2; color: #dc2626; }
+    .flag-reason {
+      margin-top: 8px;
+      background: #fff7ed;
+      border-left: 3px solid #f59e0b;
+      border-radius: 0 6px 6px 0;
+      padding: 7px 10px;
+      font-size: 12px;
+      color: #92400e;
+    }
+
+    /* 优化建议 */
+    .suggestion-list { display: flex; flex-direction: column; gap: 12px; }
+    .suggestion-item {
+      display: flex; gap: 12px;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #e8ebf2;
+    }
+    .suggestion-item.priority-high { border-left: 3px solid #ef4444; }
+    .suggestion-item.priority-med { border-left: 3px solid #f59e0b; }
+    .suggestion-item.priority-low { border-left: 3px solid #22c55e; }
+    .suggestion-num {
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #eff4ff;
+      color: #0052a5;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .suggestion-text { font-size: 13px; color: #374151; line-height: 1.6; }
+    .suggestion-tag {
+      display: inline-block;
+      background: #eff4ff;
+      color: #0052a5;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 6px;
+      margin-right: 6px;
+    }
+
+    /* 无数据提示 */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #8a94a6;
+      font-size: 14px;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .topbar { padding: 0 16px; }
+      .history-bar { padding: 0 16px; }
+      .main { padding: 16px; }
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .history-tab.active::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- 顶部导航栏 -->
+<header class="topbar">
+  <div class="topbar-logo">
+    <img class="topbar-logo-img" src="/alfalaval-logo.png" alt="Alfa Laval" />
+  </div>
+  <div class="topbar-divider"></div>
+  <span class="topbar-title">派工合理性分析报告</span>
+  <div class="topbar-badge">
+    <span class="badge-dot"></span>
+    智能分析助手
+  </div>
+</header>
+
+<!-- 历史报告时间轴条 -->
+<div class="history-bar">
+  <span class="history-bar-label">历史报告</span>
+  <div class="history-bar-sep"></div>
+  <div class="history-tabs">
+
+    <div class="history-tab active" id="tab-apr-2025" onclick="switchReport('apr-2025')">
+      <span class="tab-month">2025年4月</span>
+      <div class="tab-pills">
+        <span class="tab-pill score-warn">79分</span>
+        <span class="tab-pill flag-pill">⚠ 2异常</span>
+        <span class="tab-badge-new">最新</span>
+      </div>
+    </div>
+
+    <div class="history-tab" id="tab-mar-2025" onclick="switchReport('mar-2025')">
+      <span class="tab-month">2025年3月</span>
+      <div class="tab-pills">
+        <span class="tab-pill score-good">82分</span>
+        <span class="tab-pill flag-pill">⚠ 2异常</span>
+      </div>
+    </div>
+
+    <div class="history-tab" id="tab-feb-2025" onclick="switchReport('feb-2025')">
+      <span class="tab-month">2025年2月</span>
+      <div class="tab-pills">
+        <span class="tab-pill score-warn">76分</span>
+        <span class="tab-pill flag-pill">⚠ 3异常</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 主内容区 -->
+<main class="main" id="main-content">
+  <!-- 动态渲染 -->
+</main>
+
+<script>
+// ── 三份完整报告数据 ──────────────────────────────────────────────
+const reports = {
+
+  'feb-2025': {
+    title: '2025年2月 派工合理性分析报告',
+    month: '2025年2月',
+    generatedAt: '2025-02-05 09:03',
+    totalRecords: 18,
+    avgScore: 76,
+    flaggedCount: 3,
+    scoreDistribution: [
+      { label: '90-100', count: 5, color: '#22c55e' },
+      { label: '80-89',  count: 6, color: '#4ade80' },
+      { label: '60-79',  count: 4, color: '#f59e0b' },
+      { label: '<60',    count: 3, color: '#ef4444' },
+    ],
+    records: [
+      { id: 'dq1', date: '02/04', address: '苏州吴中区',   engineer: '李明', score: 95, flagged: false, isNearest: true,  distanceDiff: 0,   workload: 62, isLowWorkload: true },
+      { id: 'dq2', date: '02/07', address: '南京鼓楼区',   engineer: '陈晨', score: 42, flagged: true,  isNearest: false, distanceDiff: 85,  workload: 88, isLowWorkload: false, flagReason: '未选择最近工程师（张伟距离近85km），且指派工程师工时已偏高' },
+      { id: 'dq3', date: '02/11', address: '上海浦东新区', engineer: '王强', score: 82, flagged: false, isNearest: true,  distanceDiff: 0,   workload: 71, isLowWorkload: false },
+      { id: 'dq4', date: '02/14', address: '杭州滨江区',   engineer: '张伟', score: 68, flagged: false, isNearest: false, distanceDiff: 42,  workload: 55, isLowWorkload: true },
+      { id: 'dq5', date: '02/18', address: '无锡新区',     engineer: '刘洋', score: 55, flagged: true,  isNearest: false, distanceDiff: 120, workload: 28, isLowWorkload: true, flagReason: '差旅成本显著高于就近指派方案，偏离最优解' },
+      { id: 'dq6', date: '02/21', address: '苏州相城区',   engineer: '李明', score: 88, flagged: false, isNearest: true,  distanceDiff: 0,   workload: 78, isLowWorkload: false },
+      { id: 'dq7', date: '02/25', address: '南京江宁区',   engineer: '王强', score: 38, flagged: true,  isNearest: false, distanceDiff: 95,  workload: 91, isLowWorkload: false, flagReason: '指派工程师工时已达91h（偏高），且差旅距离远超最近候选人' },
+    ],
+    suggestions: [
+      { priority: 'high', tag: '紧急优化', text: '2月7日南京鼓楼任务：张伟距离更近且当月工时仅58h，优先级更高，建议复盘决策原因，完善"就近优先"规则的执行机制。' },
+      { priority: 'high', tag: '规则补充', text: '2月25日南京江宁任务：陈晨工时已达91h，应触发自动限制。建议在规则引擎中增加月度工时上限校验（阈值80h），超限自动降权。' },
+      { priority: 'med',  tag: '策略建议', text: '建议将"就近优先"与"工时均衡"两项纳入系统硬约束，减少人为偏差。当两项均未满足时，系统应自动弹出确认提示。' },
+    ],
+  },
+
+  'mar-2025': {
+    title: '2025年3月 派工合理性分析报告',
+    month: '2025年3月',
+    generatedAt: '2025-03-04 10:32',
+    totalRecords: 21,
+    avgScore: 82,
+    flaggedCount: 2,
+    scoreDistribution: [
+      { label: '90-100', count: 8,  color: '#22c55e' },
+      { label: '80-89',  count: 7,  color: '#4ade80' },
+      { label: '60-79',  count: 4,  color: '#f59e0b' },
+      { label: '<60',    count: 2,  color: '#ef4444' },
+    ],
+    records: [
+      { id: 'mq1', date: '03/03', address: '苏州高新区',   engineer: '李明', score: 96, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 44, isLowWorkload: true },
+      { id: 'mq2', date: '03/05', address: '上海徐汇区',   engineer: '王强', score: 91, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 52, isLowWorkload: true },
+      { id: 'mq3', date: '03/08', address: '南京建邺区',   engineer: '赵磊', score: 78, flagged: false, isNearest: false, distanceDiff: 30, workload: 38, isLowWorkload: true },
+      { id: 'mq4', date: '03/12', address: '杭州钱塘区',   engineer: '张伟', score: 85, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 61, isLowWorkload: true },
+      { id: 'mq5', date: '03/15', address: '无锡锡山区',   engineer: '李明', score: 47, flagged: true,  isNearest: false, distanceDiff: 98, workload: 85, isLowWorkload: false, flagReason: '派遣远距离工程师（+98km），本地赵磊工时较低，应优先选用' },
+      { id: 'mq6', date: '03/19', address: '苏州工业园区', engineer: '张伟', score: 88, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 68, isLowWorkload: true },
+      { id: 'mq7', date: '03/24', address: '上海嘉定区',   engineer: '孙浩', score: 52, flagged: true,  isNearest: false, distanceDiff: 75, workload: 77, isLowWorkload: false, flagReason: '工程师工时偏高（77h），且差旅成本高于区域内备选方案' },
+      { id: 'mq8', date: '03/27', address: '南京秦淮区',   engineer: '陈晨', score: 94, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 40, isLowWorkload: true },
+    ],
+    suggestions: [
+      { priority: 'high', tag: '需优化', text: '3月15日无锡锡山任务：赵磊距离更近且工时较低，派遣李明不符合优化原则。2月已有类似偏差，建议排查是否存在人为偏好因素。' },
+      { priority: 'med',  tag: '改进建议', text: '3月24日上海嘉定任务：孙浩当月工时已达77h，应启动预警提示。建议在排班系统中对月累计工时≥70h的工程师自动添加标记。' },
+      { priority: 'low',  tag: '正向反馈', text: '本月整体合理性评分较2月提升6分（76→82），"就近原则"执行率从72%提升至81%，派工决策质量持续改善。' },
+    ],
+  },
+
+  'apr-2025': {
+    title: '2025年4月 派工合理性分析报告',
+    month: '2025年4月',
+    generatedAt: '2025-04-02 14:05',
+    totalRecords: 16,
+    avgScore: 79,
+    flaggedCount: 2,
+    scoreDistribution: [
+      { label: '90-100', count: 6, color: '#22c55e' },
+      { label: '80-89',  count: 5, color: '#4ade80' },
+      { label: '60-79',  count: 3, color: '#f59e0b' },
+      { label: '<60',    count: 2, color: '#ef4444' },
+    ],
+    records: [
+      { id: 'aq1', date: '04/01', address: '苏州相城区',   engineer: '李明', score: 97, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 18, isLowWorkload: true },
+      { id: 'aq2', date: '04/03', address: '上海浦东新区', engineer: '王强', score: 93, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 22, isLowWorkload: true },
+      { id: 'aq3', date: '04/07', address: '无锡惠山区',   engineer: '张伟', score: 89, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 35, isLowWorkload: true },
+      { id: 'aq4', date: '04/10', address: '南京栖霞区',   engineer: '陈晨', score: 72, flagged: false, isNearest: false, distanceDiff: 28, workload: 41, isLowWorkload: true },
+      { id: 'aq5', date: '04/14', address: '杭州上城区',   engineer: '赵磊', score: 44, flagged: true,  isNearest: false, distanceDiff: 110, workload: 68, isLowWorkload: false, flagReason: '工程师工时偏高（68h）且差旅距离110km，华东刘洋更近且工时较少' },
+      { id: 'aq6', date: '04/17', address: '苏州园区',     engineer: '李明', score: 91, flagged: false, isNearest: true,  distanceDiff: 0,  workload: 52, isLowWorkload: true },
+      { id: 'aq7', date: '04/22', address: '上海虹桥区',   engineer: '孙浩', score: 51, flagged: true,  isNearest: false, distanceDiff: 88, workload: 74, isLowWorkload: false, flagReason: '孙浩工时已达74h，本月第二次被高工时派遣，建议介入管理' },
+      { id: 'aq8', date: '04/25', address: '南京雨花台区', engineer: '王强', score: 85, flagged: false, isNearest: false, distanceDiff: 15, workload: 48, isLowWorkload: true },
+    ],
+    suggestions: [
+      { priority: 'high', tag: '重点关注', text: '孙浩已连续两月出现工时偏高被派遣的情况（3月77h、4月74h），建议由主管介入复盘，评估是否存在资源调配失衡问题。' },
+      { priority: 'high', tag: '规则完善', text: '4月14日杭州任务：华东刘洋距离更近且工时更少，却选用赵磊跨区支援，建议规则引擎对110km以上的跨区派工自动触发二次确认。' },
+      { priority: 'low',  tag: '趋势观察', text: '4月均分79分，较3月（82分）小幅回落，主要由月初两条异常记录拉低。建议持续监控，预计5月随规则优化恢复至82分以上。' },
+    ],
+  },
+};
+
+// ── 渲染逻辑 ──────────────────────────────────────────────────────
+let currentReport = 'apr-2025';
+
+function getScoreClass(score, flagged) {
+  if (flagged) return 'ring-red';
+  if (score >= 80) return 'ring-green';
+  if (score >= 60) return 'ring-amber';
+  return 'ring-red';
+}
+
+function renderBarChart(dist) {
+  const max = Math.max(...dist.map(d => d.count));
+  return dist.map(d => {
+    const h = max > 0 ? Math.round((d.count / max) * 72) : 0;
+    return `
+      <div class="bar-col">
+        <span class="bar-count" style="color:${d.color}">${d.count}</span>
+        <div class="bar-fill" style="height:${h}px;background:${d.color}"></div>
+        <span class="bar-label">${d.label}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderRecords(records) {
+  return records.map(r => {
+    const ringClass = getScoreClass(r.score, r.flagged);
+    const indNearest = r.isNearest
+      ? `<span class="indicator ind-pass">✓ 就近选择</span>`
+      : `<span class="indicator ind-fail">✗ 就近偏差 (+${r.distanceDiff}km)</span>`;
+    const indWorkload = r.isLowWorkload
+      ? `<span class="indicator ind-pass">✓ 工时均衡 (${r.workload}h)</span>`
+      : `<span class="indicator ind-fail">✗ 工时偏高 (${r.workload}h)</span>`;
+    const badge = r.flagged
+      ? `<span class="flag-badge">⚠ 异常</span>`
+      : `<span class="normal-badge">✓ 正常</span>`;
+    const flagReason = r.flagged && r.flagReason
+      ? `<div class="flag-reason">💡 ${r.flagReason}</div>` : '';
+    return `
+      <div class="record-card ${r.flagged ? 'flagged' : ''}">
+        <div class="score-ring ${ringClass}">${r.score}</div>
+        <div class="record-body">
+          <div class="record-title-row">
+            <span class="record-title">${r.date} · ${r.address}</span>
+            ${badge}
+          </div>
+          <div class="record-engineer">指派工程师：${r.engineer}</div>
+          <div class="indicator-row">${indNearest}${indWorkload}</div>
+          ${flagReason}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderSuggestions(suggestions) {
+  return suggestions.map((s, i) => `
+    <div class="suggestion-item priority-${s.priority}">
+      <div class="suggestion-num">${i + 1}</div>
+      <div class="suggestion-text">
+        <span class="suggestion-tag">${s.tag}</span>${s.text}
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderReport(reportId) {
+  const r = reports[reportId];
+  if (!r) return '<div class="empty-state">报告数据不存在</div>';
+
+  const normalCount = r.totalRecords - r.flaggedCount;
+  const compliance = Math.round((normalCount / r.totalRecords) * 100);
+  const scoreColor = r.avgScore >= 80 ? '#16a34a' : r.avgScore >= 70 ? '#d97706' : '#dc2626';
+
+  return `
+    <!-- 报告标题 -->
+    <div class="report-header">
+      <div class="report-title-group">
+        <div class="report-title">📊 ${r.title}</div>
+        <div class="report-meta">
+          <span>🕐 生成于 ${r.generatedAt}</span>
+          <span>📁 共 ${r.totalRecords} 条派工记录</span>
+          <span>🤖 AI 自动回溯分析</span>
+        </div>
+      </div>
+      <div class="report-status-badge">
+        <div class="status-label">综合评分</div>
+        <div class="status-value" style="color:#fff">${r.avgScore}</div>
+        <div class="status-label">/ 100</div>
+      </div>
+    </div>
+
+    <!-- KPI 卡片 -->
+    <div class="kpi-row">
+      <div class="kpi-card highlight-blue">
+        <div class="kpi-label">平均合理性评分</div>
+        <div class="kpi-value" style="color:${scoreColor}">${r.avgScore}</div>
+        <div class="kpi-sub">满分100分</div>
+      </div>
+      <div class="kpi-card highlight-red">
+        <div class="kpi-label">异常标注记录</div>
+        <div class="kpi-value">${r.flaggedCount}</div>
+        <div class="kpi-sub">需复盘优化</div>
+      </div>
+      <div class="kpi-card highlight-green">
+        <div class="kpi-label">正常派工记录</div>
+        <div class="kpi-value">${normalCount}</div>
+        <div class="kpi-sub">符合最优策略</div>
+      </div>
+      <div class="kpi-card highlight-amber">
+        <div class="kpi-label">合规率</div>
+        <div class="kpi-value">${compliance}%</div>
+        <div class="kpi-sub">目标 ≥ 85%</div>
+      </div>
+    </div>
+
+    <!-- 评分分布 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-icon icon-blue">📈</div>
+        <span class="section-title">评分分布</span>
+        <span class="section-subtitle">${r.month} · ${r.totalRecords} 条记录</span>
+      </div>
+      <div class="section-body">
+        <div class="legend-row">
+          <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>90-100 优秀</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#4ade80"></span>80-89 良好</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>60-79 一般</span>
+          <span class="legend-item"><span class="legend-dot" style="background:#ef4444"></span>&lt;60 需关注</span>
+        </div>
+        <div class="bar-chart">${renderBarChart(r.scoreDistribution)}</div>
+      </div>
+    </div>
+
+    <!-- 派工记录明细 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-icon icon-amber">📋</div>
+        <span class="section-title">派工记录明细</span>
+        <span class="section-subtitle">红色标注 = 偏差异常</span>
+      </div>
+      <div class="section-body">
+        <div class="record-list">
+          ${renderRecords(r.records)}
+        </div>
+      </div>
+    </div>
+
+    <!-- 优化建议 -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-header-icon icon-green">💡</div>
+        <span class="section-title">AI 优化建议</span>
+        <span class="section-subtitle">基于本月偏差分析自动生成</span>
+      </div>
+      <div class="section-body">
+        <div class="suggestion-list">
+          ${renderSuggestions(r.suggestions)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function switchReport(reportId) {
+  // 更新时间轴条激活状态
+  document.querySelectorAll('.history-tab').forEach(el => el.classList.remove('active'));
+  const tabEl = document.getElementById('tab-' + reportId);
+  if (tabEl) {
+    tabEl.classList.add('active');
+    tabEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+  // 渲染主内容
+  document.getElementById('main-content').innerHTML = renderReport(reportId);
+  currentReport = reportId;
+  // 更新 URL hash
+  history.replaceState(null, '', '#' + reportId);
+}
+
+// ── 初始化 ────────────────────────────────────────────────────────
+(function init() {
+  const hash = location.hash.replace('#', '');
+  const target = reports[hash] ? hash : 'apr-2025';
+  switchReport(target);
+})();
+</script>
+</body>
+</html>

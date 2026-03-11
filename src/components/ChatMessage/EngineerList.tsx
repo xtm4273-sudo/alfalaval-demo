@@ -1,26 +1,39 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import type { Engineer } from '../../types/index.ts';
-import EngineerCard from '../EngineerCard';
 
 interface EngineerListProps {
   engineers: Engineer[];
   onSelect?: (engineer: Engineer) => void;
 }
 
-const EngineerList: React.FC<EngineerListProps> = ({ engineers, onSelect }) => {
+const EngineerList: React.FC<EngineerListProps> = ({ engineers }) => {
+  const lines: string[] = [];
+  engineers.forEach((e, index) => {
+    const rank = e.rank ?? index + 1;
+    const status = e.isAvailable ? '可用' : '忙碌';
+    const skillStr = e.skills?.length ? e.skills.join('、') : '—';
+    lines.push(`${rank}. ${e.name}（${e.location}）${status}`);
+    lines.push(`   技能：${skillStr} | 距离${e.travelDistance}km 利用率${e.utilizationRate}% 经验${e.customerExperience}次`);
+    if (e.recommendationReason) {
+      lines.push(`   推荐理由：${e.recommendationReason}`);
+    }
+    lines.push('');
+  });
+
+  const text = lines.join('\n').trimEnd();
+
   return (
-    <div style={{ width: '100%' }} className="space-y-2">
-      {engineers.map((engineer, index) => (
-        <motion.div
-          key={engineer.id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
-        >
-          <EngineerCard engineer={engineer} onSelect={onSelect} />
-        </motion.div>
-      ))}
+    <div
+      style={{
+        width: '100%',
+        fontSize: '13px',
+        lineHeight: 1.6,
+        color: '#333',
+        whiteSpace: 'pre-wrap',
+        wordBreak: 'break-word',
+      }}
+    >
+      {text}
     </div>
   );
 };

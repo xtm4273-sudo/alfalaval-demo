@@ -156,6 +156,29 @@ export interface WeeklyGanttOverview {
   totalTravelCost: number;
 }
 
+// 工程师私信通知
+export interface EngineerPrivateMsg {
+  engineerName: string;
+  engineerAvatar: string;
+  taskDetails: string;
+}
+
+export interface EngineerPrivateMsgData {
+  privateMessages: EngineerPrivateMsg[];
+}
+
+// 报告链接卡片（派工合理性分析 HTML 报告）
+export interface ReportLink {
+  title: string;
+  reportId: string;
+  url: string;
+  generatedAt: string;
+  totalRecords: number;
+  avgScore: number;
+  flaggedCount: number;
+  summary: string;
+}
+
 // 聊天消息类型
 export type MessageContentType =
   | 'text'
@@ -171,6 +194,7 @@ export type MessageContentType =
   | 'pre-schedule-summary'
   | 'weekly-gantt-overview'
   | 'dispatch-quality-score'
+  | 'report-link'
   | 'utilization-dashboard'
   | 'travel-cost-monitor'
   | 'ot-compliance-alert'
@@ -181,7 +205,15 @@ export type MessageContentType =
   | 'phone-callback'
   | 'feedback-summary'
   | 'feedback-anomaly-alert'
-  | 'wechat-survey';
+  | 'wechat-survey'
+  | 'excel-upload'
+  | 'excel-download'
+  | 'project-list-download'
+  | 'batch-reschedule-upload'
+  | 'engineer-private-msg'
+  | 'engineer-calendar'
+  | 'progress-report'
+  | 'risk-alert';
 
 // 聊天消息
 export interface ChatMessage {
@@ -204,6 +236,7 @@ export interface ChatMessage {
     | PreScheduleSummary
     | WeeklyGanttOverview
     | DispatchQualityReport
+    | ReportLink
     | UtilizationDashboard
     | TravelCostMonitor
     | OTComplianceReport
@@ -214,7 +247,15 @@ export interface ChatMessage {
     | PhoneCallbackData
     | FeedbackSummaryData
     | FeedbackAnomalyReport
-    | WeChatSurveyData;
+    | WeChatSurveyData
+    | ExcelScheduleData
+    | ExcelUploadData
+    | ProjectListExcelData
+    | BatchRescheduleUploadData
+    | EngineerPrivateMsgData
+    | EngineerCalendarData
+    | ProgressReportData
+    | RiskAlertData;
   mentionedUser?: string;  // @的用户
 }
 
@@ -496,4 +537,121 @@ export interface WeChatSurveyData {
   comment: string;
   submitted: boolean;
   submittedAt?: string;
+}
+
+// Excel 排班表数据（周预排输出）
+export interface ExcelScheduleRow {
+  engineerName: string;
+  engineerAvatar: string;
+  location: string;
+  tasks: { [date: string]: string };  // date -> task label
+}
+
+export interface ExcelScheduleData {
+  weekLabel: string;
+  dateHeaders: string[];              // 如 ['3/10 周一', '3/11 周二', ...]
+  rows: ExcelScheduleRow[];
+  totalTravelCost: number;
+  fileName: string;
+}
+
+// Excel 上传附件（派单员输入任务列表的展示）
+export interface ExcelUploadData {
+  fileName: string;
+  rowCount: number;
+  previewTasks: PreScheduleTask[];
+}
+
+// 受影响项目行（用于导出 Excel 与列表展示，插单资源不足链式重排）
+export interface RescheduleCandidateProject {
+  projectId: string;
+  customerAddress: string;
+  productService: string;
+  plannedStart: string;
+  plannedEnd: string;
+  headcount: number;
+  assignedEngineers: string;
+  flexibility: '可调整' | '建议保留' | '战略客户';
+  note?: string;
+}
+
+// 项目列表 Excel 数据（AI 提供下载）
+export interface ProjectListExcelData {
+  timeRangeLabel: string;
+  urgentTaskSummary: string;
+  rows: RescheduleCandidateProject[];
+  fileName: string;
+}
+
+// 单条批量重排意向（用户上传 Excel 的预览行）
+export interface BatchRescheduleItem {
+  projectId: string;
+  suggestedStart: string;
+  suggestedEnd: string;
+  reason?: string;
+}
+
+// 批量重排上传展示（与 ExcelUploadData 区分）
+export interface BatchRescheduleUploadData {
+  fileName: string;
+  rowCount: number;
+  previewItems: BatchRescheduleItem[];
+}
+
+// ========== 日终进度汇报数据类型 ==========
+
+export interface ProgressReportData {
+  engineerName: string;
+  engineerAvatar: string;
+  taskName: string;
+  taskAddress: string;
+  plannedCompletion: string;   // 计划完工时间描述，如"今日"
+  actualProgress: string;      // 完成情况描述，如"已完成 2/3 台"
+  progressPercent: number;     // 完成百分比 0-100
+  status: 'on-track' | 'delayed';
+  delayReason?: string;        // 延期原因
+  estimatedCompletion?: string; // 预计实际完工时间
+  delayDays?: number;          // 滞后天数（小数）
+}
+
+export interface RiskAlertData {
+  engineerName: string;
+  engineerAvatar: string;
+  taskName: string;
+  taskAddress: string;
+  plannedCompletion: string;
+  estimatedCompletion: string;
+  delayDays: number;
+  delayReason: string;
+  impact: string;              // 影响描述
+  suggestion: string;          // 建议操作
+  recipients: string[];        // 通知对象列表
+}
+
+// ========== 工程师日历数据类型 ==========
+
+// 单个任务时间段
+export interface EngineerCalendarTask {
+  startTime: string;    // "09:00"
+  endTime: string;      // "17:00"
+  taskName: string;     // "GPHE M30 M5服务"
+  location: string;     // "苏州工业园区"
+  customer?: string;    // 客户名称（可选）
+}
+
+// 日历中某一天的状态
+export interface EngineerCalendarDay {
+  date: string;         // "3/17"
+  dayLabel: string;     // "周一"
+  status: 'free' | 'busy' | 'half-busy' | 'leave';
+  tasks?: EngineerCalendarTask[];  // 当天任务列表（busy/half-busy 时有值）
+}
+
+// 工程师日历卡片数据
+export interface EngineerCalendarData {
+  engineerName: string;
+  engineerAvatar: string;
+  engineerLocation: string;
+  weekLabel: string;    // "下周（3/17 - 3/21）"
+  days: EngineerCalendarDay[];
 }

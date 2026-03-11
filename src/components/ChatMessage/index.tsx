@@ -13,6 +13,7 @@ import type {
   PreScheduleSummary,
   WeeklyGanttOverview,
   DispatchQualityReport,
+  ReportLink,
   UtilizationDashboard,
   TravelCostMonitor,
   OTComplianceReport,
@@ -24,6 +25,13 @@ import type {
   FeedbackSummaryData,
   FeedbackAnomalyReport,
   WeChatSurveyData,
+  ExcelScheduleData,
+  ExcelUploadData,
+  ProjectListExcelData,
+  BatchRescheduleUploadData,
+  EngineerPrivateMsgData,
+  ProgressReportData,
+  RiskAlertData,
 } from '../../types/index.ts';
 import EngineerList from './EngineerList';
 import TaskInfoCard from '../TaskInfoCard';
@@ -47,13 +55,45 @@ import PhoneCallbackInputCard from '../PhoneCallbackInputCard';
 import FeedbackSummaryCard from '../FeedbackSummaryCard';
 import FeedbackAnomalyAlertCard from '../FeedbackAnomalyAlertCard';
 import WeChatSurveyCard from '../WeChatSurveyCard';
+import ReportLinkCard from '../ReportLinkCard';
+import ExcelDownloadCard from '../ExcelDownloadCard';
+import ExcelUploadCard from '../ExcelUploadCard';
+import ProjectListDownloadCard from '../ProjectListDownloadCard';
+import BatchRescheduleUploadCard from '../BatchRescheduleUploadCard';
+import EngineerPrivateMsgCard from '../EngineerPrivateMsgCard';
+import ProgressReportCard from '../ProgressReportCard';
+import RiskAlertCard from '../RiskAlertCard';
+
+/** 将文本中的 URL 转为可点击链接，非 URL 部分做 HTML 转义防 XSS */
+function linkifyAndEscape(text: string): string {
+  const urlPattern = /(https?:\/\/\S+)/g;
+  const parts = text.split(urlPattern);
+  return parts
+    .map((part) => {
+      if (/^https?:\/\//.test(part)) {
+        return `<a href="${part}" target="_blank" rel="noopener noreferrer" style="color: #07c160; text-decoration: underline;">${part}</a>`;
+      }
+      return part
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    })
+    .join('');
+}
 
 interface ChatMessageProps {
   message: ChatMessageType;
+  extraSelfSender?: string;
 }
 
-const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
-  const isSelf = message.sender === 'dispatcher' || message.sender === 'coordinator' || message.sender === 'customer';
+const ChatMessage: React.FC<ChatMessageProps> = ({ message, extraSelfSender }) => {
+  const isSelf =
+    message.sender === 'dispatcher' ||
+    message.sender === 'coordinator' ||
+    message.sender === 'customer' ||
+    (extraSelfSender !== undefined && message.sender === extraSelfSender);
   const isSystem = message.sender === 'system';
 
   // 系统消息
@@ -100,6 +140,8 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         return <WeeklyGanttOverviewCard data={message.extraData as WeeklyGanttOverview} />;
       case 'dispatch-quality-score':
         return <DispatchQualityScoreCard data={message.extraData as DispatchQualityReport} />;
+      case 'report-link':
+        return <ReportLinkCard data={message.extraData as ReportLink} />;
       case 'utilization-dashboard':
         return <UtilizationDashboardCard data={message.extraData as UtilizationDashboard} />;
       case 'travel-cost-monitor':
@@ -122,10 +164,25 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         return <FeedbackAnomalyAlertCard data={message.extraData as FeedbackAnomalyReport} />;
       case 'wechat-survey':
         return <WeChatSurveyCard data={message.extraData as WeChatSurveyData} />;
+      case 'excel-download':
+        return <ExcelDownloadCard data={message.extraData as ExcelScheduleData} />;
+      case 'excel-upload':
+        return <ExcelUploadCard data={message.extraData as ExcelUploadData} />;
+      case 'project-list-download':
+        return <ProjectListDownloadCard data={message.extraData as ProjectListExcelData} />;
+      case 'batch-reschedule-upload':
+        return <BatchRescheduleUploadCard data={message.extraData as BatchRescheduleUploadData} />;
+      case 'engineer-private-msg':
+        return <EngineerPrivateMsgCard data={message.extraData as EngineerPrivateMsgData} />;
+      case 'progress-report':
+        return <ProgressReportCard data={message.extraData as ProgressReportData} />;
+      case 'risk-alert':
+        return <RiskAlertCard data={message.extraData as RiskAlertData} />;
       case 'text':
       default:
+        // URL 转可点击链接，非 URL 部分转义防 XSS
+        let content = linkifyAndEscape(message.content);
         // 处理@提及
-        let content = message.content;
         if (message.mentionedUser) {
           content = content.replace(
             `@${message.mentionedUser}`,
@@ -168,7 +225,6 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         <div
           className={`message-content ${isSelf ? 'self' : 'other'}`}
           style={[
-            'engineer-list',
             'task-info',
             'schedule-overview',
             'reschedule-plan',
@@ -179,6 +235,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             'pre-schedule-summary',
             'weekly-gantt-overview',
             'dispatch-quality-score',
+            'report-link',
             'utilization-dashboard',
             'travel-cost-monitor',
             'ot-compliance-alert',
@@ -190,6 +247,13 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             'feedback-summary',
             'feedback-anomaly-alert',
             'wechat-survey',
+            'excel-download',
+            'excel-upload',
+            'project-list-download',
+            'batch-reschedule-upload',
+            'engineer-private-msg',
+            'progress-report',
+            'risk-alert',
           ].includes(message.contentType)
             ? { backgroundColor: 'transparent', padding: 0, boxShadow: 'none' }
             : {}
