@@ -6,7 +6,7 @@ import ChatMessageComponent from '../../components/ChatMessage';
 
 const scenarioGroups = [
   { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: tab1Scenarios.slice(0, 2) },
-  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 6) },
+  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 5) },
   { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab1Scenarios.slice(5, 6) },
   { id: 'calendar', label: '🗓 工程师日历', type: 'normal' as const, scenarios: tab1Scenarios.slice(6) },
   { id: 'analysis', label: '📊 智能分析', type: 'analysis' as const, scenarios: tab3Scenarios },

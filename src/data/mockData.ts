@@ -1098,29 +1098,6 @@ const tab2RescheduleScenarios: DemoScenario[] = [
         timestamp: '14:09',
       },
       {
-        id: 'm3b',
-        sender: 'agent',
-        senderName: '智能派单助手',
-        senderAvatar: '🤖',
-        content: '',
-        contentType: 'engineer-private-msg',
-        timestamp: '14:09',
-        extraData: {
-          privateMessages: [
-            {
-              engineerName: '李明',
-              engineerAvatar: '👨‍🔧',
-              taskDetails: '您好，您已被指派执行以下紧急任务：\n\n📋 工单信息\n地点：苏州工业园区\n产品：GPHE M30\n服务类型：M5服务\n时间：2024-03-05 至 2024-03-09\n所需人数：2人\n\n⚠️ 此为紧急插单任务，请优先安排行程，明日准时到位。\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-            },
-            {
-              engineerName: '陈晨',
-              engineerAvatar: '👨‍🎓',
-              taskDetails: '您好，您已被指派执行以下紧急任务：\n\n📋 工单信息\n地点：苏州工业园区\n产品：GPHE M30\n服务类型：M5服务\n时间：2024-03-05 至 2024-03-09\n所需人数：2人\n\n⚠️ 此为紧急插单任务，请优先安排行程，明日准时到位。\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-            },
-          ],
-        },
-      },
-      {
         id: 'm4',
         sender: 'engineer',
         senderName: '李明',
@@ -1209,29 +1186,6 @@ const tab2RescheduleScenarios: DemoScenario[] = [
         content: '✅ 已通过私信向李明、陈晨发送紧急任务通知，请注意查收',
         contentType: 'text',
         timestamp: '16:08',
-      },
-      {
-        id: 'm7b',
-        sender: 'agent',
-        senderName: '智能派单助手',
-        senderAvatar: '🤖',
-        content: '',
-        contentType: 'engineer-private-msg',
-        timestamp: '16:08',
-        extraData: {
-          privateMessages: [
-            {
-              engineerName: '李明',
-              engineerAvatar: '👨‍🔧',
-              taskDetails: '您好，您已被指派执行以下紧急任务：\n\n📋 工单信息\n地点：苏州工业园区\n产品：GPHE M30\n服务类型：M5服务\n时间：2024-03-05 至 2024-03-09\n所需人数：2人\n\n⚠️ 此为紧急插单任务，请优先安排行程。\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-            },
-            {
-              engineerName: '陈晨',
-              engineerAvatar: '👨‍🎓',
-              taskDetails: '您好，您已被指派执行以下紧急任务：\n\n📋 工单信息\n地点：苏州工业园区\n产品：GPHE M30\n服务类型：M5服务\n时间：2024-03-05 至 2024-03-09\n所需人数：2人\n\n⚠️ 此为紧急插单任务，请优先安排行程。\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-            },
-          ],
-        },
       },
       {
         id: 'm8',
@@ -1527,30 +1481,30 @@ tab1Scenarios.push({
   ],
 });
 
-// ========== 工程师日历场景文本（企微 Markdown 风格）==========
+// ========== 工程师日历场景（纯文字回复）==========
 
-const luJingCalendarText = `📅 <b>👩‍🔧 吕晶工程师 · 下周排单日历（3/17–3/21）</b>
-<span style="color:#999999">── 数据来源：排班系统实时同步 ──</span>
+const luJingCalendarText = `📅 吕晶工程师 · 下周排单日历（3/17–3/21）
+── 数据来源：排班系统实时同步 ──
 
-<b>周一  3/17</b>  <span style="color:#E65100">● 繁忙</span>
-　🕐 09:00–17:00　📋 GPHE M30 M5服务
-　📍 在苏州工业园区做维修（博世汽车）
+周一 3/17  ● 繁忙
+🕐 09:00–17:00  📋 GPHE M30 M5服务
+📍 苏州工业园区（博世汽车）
 
-<b>周二  3/18</b>  <span style="color:#E65100">● 上午忙</span>
-　🕐 09:00–12:00　📋 M10 定期巡检
-　📍 在南京江宁区做巡检（扬子石化）
-　下午 <span style="color:#2E7D32">✓ 空闲</span>
+周二 3/18  ● 上午忙
+🕐 09:00–12:00  📋 M10 定期巡检
+📍 南京江宁区（扬子石化）
+下午 ✓ 空闲
 
-<b>周三  3/19</b>  <span style="color:#2E7D32">● 空闲</span>
+周三 3/19  ● 空闲
 
-<b>周四  3/20</b>  <span style="color:#E65100">● 繁忙</span>
-　🕐 09:00–18:00　📋 GPHE 年度维保
-　📍 在上海松江区做维保（联合利华）
+周四 3/20  ● 繁忙
+🕐 09:00–18:00  📋 GPHE 年度维保
+📍 上海松江区（联合利华）
 
-<b>周五  3/21</b>  <span style="color:#2E7D32">● 空闲</span>
+周五 3/21  ● 空闲
 
-<span style="color:#CCCCCC">────────────────────</span>
-📊 本周概览：有任务 <b>3 天</b> | 可约 <b>2 天</b>`;
+────────────────────
+📊 本周概览：有任务 3 天 | 可约 2 天`;
 
 // 场景A：完整信息查询日历
 tab1Scenarios.push({
@@ -1683,54 +1637,6 @@ tab2Scenarios.push({
       content: '✅ 已通过私信向7位工程师分别发送各自任务通知，请注意查收',
       contentType: 'text',
       timestamp: '17:17',
-    },
-    {
-      id: 'm5b',
-      sender: 'agent',
-      senderName: '智能派单助手',
-      senderAvatar: '🤖',
-      content: '',
-      contentType: 'engineer-private-msg',
-      timestamp: '17:17',
-      extraData: {
-        privateMessages: [
-          {
-            engineerName: '李明',
-            engineerAvatar: '👨‍🔧',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：苏州PHE定期清洗\n时间：3/10-3/11\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '王强',
-            engineerAvatar: '👨‍💻',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：上海泵系统故障排查\n时间：3/11-3/14\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '张伟',
-            engineerAvatar: '👨‍🔬',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务1：无锡紧急故障维修（主责）\n时间：3/10-3/11\n任务2：南京GPHE大修支援\n时间：3/12起\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '陈晨',
-            engineerAvatar: '👨‍🎓',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：南京GPHE大修（主责）\n时间：3/10-3/20\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '刘洋',
-            engineerAvatar: '🧑‍🔧',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：杭州年度预防性维保\n时间：3/12-3/14\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '赵磊',
-            engineerAvatar: '👷',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：常州螺旋板换热器检修\n时间：3/10-3/12\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-          {
-            engineerName: '孙浩',
-            engineerAvatar: '🧑‍💼',
-            taskDetails: '您好，以下是您下周的任务安排：\n\n📋 工单信息\n任务：宁波GPHE年度大修\n时间：3/10-3/14\n\n📱 稍后会在OneService平台中可以看到工单，请注意查收。',
-          },
-        ],
-      },
     },
   ],
 });

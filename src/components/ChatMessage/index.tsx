@@ -29,9 +29,9 @@ import type {
   ExcelUploadData,
   ProjectListExcelData,
   BatchRescheduleUploadData,
-  EngineerPrivateMsgData,
   ProgressReportData,
   RiskAlertData,
+  EngineerCalendarData,
 } from '../../types/index.ts';
 import EngineerList from './EngineerList';
 import TaskInfoCard from '../TaskInfoCard';
@@ -60,9 +60,9 @@ import ExcelDownloadCard from '../ExcelDownloadCard';
 import ExcelUploadCard from '../ExcelUploadCard';
 import ProjectListDownloadCard from '../ProjectListDownloadCard';
 import BatchRescheduleUploadCard from '../BatchRescheduleUploadCard';
-import EngineerPrivateMsgCard from '../EngineerPrivateMsgCard';
 import ProgressReportCard from '../ProgressReportCard';
 import RiskAlertCard from '../RiskAlertCard';
+import EngineerCalendarCard from '../EngineerCalendarCard';
 
 /** 将文本中的 URL 转为可点击链接，非 URL 部分做 HTML 转义防 XSS */
 function linkifyAndEscape(text: string): string {
@@ -172,12 +172,12 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, extraSelfSender }) =
         return <ProjectListDownloadCard data={message.extraData as ProjectListExcelData} />;
       case 'batch-reschedule-upload':
         return <BatchRescheduleUploadCard data={message.extraData as BatchRescheduleUploadData} />;
-      case 'engineer-private-msg':
-        return <EngineerPrivateMsgCard data={message.extraData as EngineerPrivateMsgData} />;
       case 'progress-report':
         return <ProgressReportCard data={message.extraData as ProgressReportData} />;
       case 'risk-alert':
         return <RiskAlertCard data={message.extraData as RiskAlertData} />;
+      case 'engineer-calendar':
+        return <EngineerCalendarCard data={message.extraData as EngineerCalendarData} />;
       case 'text':
       default:
         // URL 转可点击链接，非 URL 部分转义防 XSS
@@ -251,9 +251,9 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, extraSelfSender }) =
             'excel-upload',
             'project-list-download',
             'batch-reschedule-upload',
-            'engineer-private-msg',
             'progress-report',
             'risk-alert',
+            'engineer-calendar',
           ].includes(message.contentType)
             ? { backgroundColor: 'transparent', padding: 0, boxShadow: 'none' }
             : {}

@@ -156,17 +156,6 @@ export interface WeeklyGanttOverview {
   totalTravelCost: number;
 }
 
-// 工程师私信通知
-export interface EngineerPrivateMsg {
-  engineerName: string;
-  engineerAvatar: string;
-  taskDetails: string;
-}
-
-export interface EngineerPrivateMsgData {
-  privateMessages: EngineerPrivateMsg[];
-}
-
 // 报告链接卡片（派工合理性分析 HTML 报告）
 export interface ReportLink {
   title: string;
@@ -210,7 +199,6 @@ export type MessageContentType =
   | 'excel-download'
   | 'project-list-download'
   | 'batch-reschedule-upload'
-  | 'engineer-private-msg'
   | 'engineer-calendar'
   | 'progress-report'
   | 'risk-alert';
@@ -252,7 +240,6 @@ export interface ChatMessage {
     | ExcelUploadData
     | ProjectListExcelData
     | BatchRescheduleUploadData
-    | EngineerPrivateMsgData
     | EngineerCalendarData
     | ProgressReportData
     | RiskAlertData;
