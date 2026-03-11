@@ -1,14 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import type { ChatMessage } from '../../types/index.ts';
+import type { ChatMessage, DemoScenario } from '../../types/index.ts';
 import { tab1Scenarios, tab3Scenarios } from '../../data/mockData';
 import ChatMessageComponent from '../../components/ChatMessage';
 
+// 显式配置每个场景所属分组，避免依赖数组下标
+const groupScenarioIds: Record<string, string[]> = {
+  normal: ['scenario1', 'scenario2'],
+  urgent: ['scenario3', 'scenario4a', 'scenario4b'],
+  pre: ['scenario6'], // 周预排-周计划
+  calendar: ['scenario-calendar-1', 'scenario-calendar-2'],
+};
+
+const buildGroupScenarios = (groupId: string): DemoScenario[] =>
+  tab1Scenarios.filter((s) => groupScenarioIds[groupId]?.includes(s.id));
+
 const scenarioGroups = [
-  { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: tab1Scenarios.slice(0, 2) },
-  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: tab1Scenarios.slice(2, 5) },
-  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: tab1Scenarios.slice(5, 6) },
-  { id: 'calendar', label: '🗓 工程师日历', type: 'normal' as const, scenarios: tab1Scenarios.slice(6) },
+  { id: 'normal', label: '普通派单', type: 'normal' as const, scenarios: buildGroupScenarios('normal') },
+  { id: 'urgent', label: '🚨 插单重排', type: 'urgent' as const, scenarios: buildGroupScenarios('urgent') },
+  { id: 'pre', label: '📅 周预排', type: 'normal' as const, scenarios: buildGroupScenarios('pre') },
+  { id: 'calendar', label: '🗓 工程师日历', type: 'normal' as const, scenarios: buildGroupScenarios('calendar') },
   { id: 'analysis', label: '📊 智能分析', type: 'analysis' as const, scenarios: tab3Scenarios },
 ];
 
