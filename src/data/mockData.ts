@@ -1988,13 +1988,14 @@ export const tab3Scenarios: DemoScenario[] = [
         timestamp: '15:20',
       },
       {
-        id: 'a5m3',
+        id: 'a5m3-matrix',
         sender: 'agent',
         senderName: '智能分析助手',
         senderAvatar: '🤖',
-        content: `分析完成！华东区域 5 类核心技能 × 4 个城市的供需矩阵已生成，请点击下方链接下载 Excel 查看。\n\n📥 <a href="${import.meta.env.BASE_URL}reports/capability-mapping.csv" target="_blank" rel="noopener noreferrer">下载能力-区域供需矩阵表（CSV/Excel）</a>\n\n（用 Excel 或 WPS 打开 CSV 即可，可另存为 xlsx）`,
-        contentType: 'text',
+        content: '',
+        contentType: 'capability-mapping',
         timestamp: '15:21',
+        extraData: capabilityMappingData,
       },
       {
         id: 'a5m3b',

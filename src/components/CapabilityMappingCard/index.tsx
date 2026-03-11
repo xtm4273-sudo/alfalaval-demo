@@ -20,9 +20,6 @@ const CapabilityMappingCard: React.FC<Props> = ({ data }) => {
   const getCell = (skill: string, region: string) =>
     data.matrix.find((c) => c.skill === skill && c.region === region);
 
-  const shortages = data.insights.filter((i) => i.type === 'shortage');
-  const surpluses = data.insights.filter((i) => i.type === 'surplus');
-
   return (
     <div className="analysis-card">
       <div className="analysis-card-header">
@@ -31,6 +28,12 @@ const CapabilityMappingCard: React.FC<Props> = ({ data }) => {
           <div className="analysis-card-title">能力-区域需求 Mapping</div>
           <div className="analysis-card-subtitle">技能供需热力矩阵 · 华东区域</div>
         </div>
+      </div>
+
+      {/* Excel 风格表格标题 */}
+      <div className="cm-excel-sheet">
+        <div className="cm-excel-sheet-title">能力-区域供需矩阵表</div>
+        <div className="cm-excel-sheet-subtitle">需求评分 1–5 分 · 供给为人头数 · 缺口/均衡/过剩见单元格标识</div>
       </div>
 
       {/* 图例 */}
@@ -45,9 +48,9 @@ const CapabilityMappingCard: React.FC<Props> = ({ data }) => {
         <span className="cm-gap-tag balanced">均衡</span>
       </div>
 
-      {/* 热力矩阵 */}
-      <div className="cm-matrix-wrap">
-        <table className="cm-matrix">
+      {/* 热力矩阵（Excel 表格式） */}
+      <div className="cm-matrix-wrap cm-excel-table-wrap">
+        <table className="cm-matrix cm-excel-table">
           <thead>
             <tr>
               <th className="cm-th-skill">技能 \ 区域</th>
@@ -81,32 +84,6 @@ const CapabilityMappingCard: React.FC<Props> = ({ data }) => {
             ))}
           </tbody>
         </table>
-      </div>
-
-      {/* 洞察建议 */}
-      <div className="cm-insights">
-        {shortages.length > 0 && (
-          <div className="cm-insight-section">
-            <div className="cm-insight-section-title shortage-title">🔴 缺口识别（{shortages.length}项）</div>
-            {shortages.map((insight, i) => (
-              <div key={i} className="cm-insight-item shortage-item">
-                <div className="cm-insight-desc">{insight.description}</div>
-                <div className="cm-insight-rec">💡 {insight.recommendation}</div>
-              </div>
-            ))}
-          </div>
-        )}
-        {surpluses.length > 0 && (
-          <div className="cm-insight-section">
-            <div className="cm-insight-section-title surplus-title">🔵 过剩识别（{surpluses.length}项）</div>
-            {surpluses.map((insight, i) => (
-              <div key={i} className="cm-insight-item surplus-item">
-                <div className="cm-insight-desc">{insight.description}</div>
-                <div className="cm-insight-rec">💡 {insight.recommendation}</div>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );

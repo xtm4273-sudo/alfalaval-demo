@@ -2341,15 +2341,77 @@ button:focus {
 .cm-gap-tag.surplus { background: #eff6ff; color: #3b82f6; }
 .cm-gap-tag.balanced { background: #f0fdf4; color: #22c55e; }
 
+/* Excel 风格表格标题 */
+.cm-excel-sheet {
+  padding: 8px 12px 6px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(to bottom, #f8f9fa 0%, #f1f3f5 100%);
+}
+.cm-excel-sheet-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a1a1a;
+  letter-spacing: 0.02em;
+}
+.cm-excel-sheet-subtitle {
+  font-size: 10px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
 .cm-matrix-wrap {
   padding: 10px 10px;
   overflow-x: auto;
+}
+
+/* Excel 表格式：外框与网格 */
+.cm-excel-table-wrap {
+  background: #fff;
+  border: 1px solid #d4d4d4;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 
 .cm-matrix {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
+}
+
+.cm-excel-table {
+  border-collapse: collapse;
+}
+.cm-excel-table th,
+.cm-excel-table td {
+  border: 1px solid #d0d0d0;
+}
+.cm-excel-table thead th {
+  background: #217346;
+  color: #fff;
+  font-weight: 600;
+  padding: 6px 8px;
+  font-size: 11px;
+}
+.cm-excel-table .cm-th-skill {
+  background: #217346;
+  color: #fff;
+  text-align: left;
+  border-color: #1d5f38;
+}
+.cm-excel-table .cm-th-region {
+  background: #217346;
+  color: #fff;
+  border-color: #1d5f38;
+}
+.cm-excel-table .cm-td-skill {
+  background: #f2f2f2;
+  font-weight: 500;
+  color: #333;
+  border-color: #d0d0d0;
+}
+.cm-excel-table .cm-td-cell {
+  border-color: #d0d0d0;
+  background: #fff;
 }
 
 .cm-th-skill, .cm-th-region {
